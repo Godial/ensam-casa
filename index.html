@@ -2,55 +2,152 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Examen Licence HTML/CSS/JS</title>
-<link rel="stylesheet" href="style.css">
+<title>🛍️ Panier interactif démo</title>
+<style>
+body { font-family: Arial; background: #f0f0f0; padding: 20px; }
+h1 { text-align: center; }
+.container { display: flex; gap: 20px; justify-content: space-between; margin-top: 20px; }
+.produits, .panier { background: white; padding: 20px; width: 48%; border-radius: 10px; box-shadow: 0 0 8px rgba(0,0,0,0.1); }
+.produit, #liste-panier li { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; padding: 8px 0; }
+input[type="number"] { width: 50px; text-align: center; }
+button { background: #007bff; color: white; border: none; border-radius: 5px; padding: 4px 8px; cursor: pointer; }
+button:hover { background: #0056b3; }
+#total { text-align: right; font-weight: bold; margin-top: 10px; color: green; }
+#vider, #demo { background: crimson; margin-top: 10px; }
+</style>
 </head>
 <body>
-  <div class="container">
-    <div class="top-row">
-      <div>
-        <h1>Examen — HTML / CSS / JavaScript (Avancé)</h1>
-        <div class="muted">Durée : 20 min — 20 questions — Langue : français</div>
-      </div>
-      <div class="timer" id="timerDisplay">20:00</div>
-    </div>
 
-    <div class="start-card" id="startCard">
-      <h2>Informations de l'étudiant</h2>
-      <label for="filiere">Filière</label>
-      <input type="text" id="filiere" placeholder="Ex: Développement informatique">
-      <label for="nom">Nom</label>
-      <input type="text" id="nom" placeholder="Ex: Doe">
-      <label for="prenom">Prénom</label>
-      <input type="text" id="prenom" placeholder="Ex: John">
-      <button class="btn" id="startBtn">Commencer l'examen</button>
-      <button class="btn secondary" id="instructionsBtn">Voir instructions</button>
-      <div id="instructions" style="display:none;" class="small">
-        L'examen dure 20 minutes. Les bonnes réponses ne seront pas affichées. Un PDF sera généré à la fin.
-      </div>
-    </div>
+<h1>🛍️ Panier interactif – Démo</h1>
 
-    <div class="exam-card" id="examCard" style="display:none;">
-      <div class="top-row">
-        <div class="small">Épreuve : HTML/CSS/JS</div>
-        <div class="small">Questions répondues : <span id="remainingQ">0</span>/20</div>
-      </div>
-      <div class="progress"><i id="progressBar"></i></div>
-      <div class="questions" id="questionsContainer"></div>
-      <button class="btn" id="submitBtn">Soumettre l'examen</button>
-      <button class="btn secondary" id="clearBtn">Réinitialiser réponses</button>
-    </div>
-
-    <div class="result-card" id="resultCard" style="display:none;">
-      <h2>Résultat</h2>
-      <p id="resultSummary" class="small"></p>
-      <button class="btn" id="downloadPdfBtn">Générer PDF</button>
-      <button class="btn secondary" id="restartBtn">Refaire l'examen</button>
-    </div>
+<div class="container">
+  <div class="produits">
+    <h2>Produits</h2>
   </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="script.js"></script>
+  <div class="panier">
+    <h2>Panier</h2>
+    <ul id="liste-panier"></ul>
+    <div id="total">Total : 0 DH</div>
+    <button id="vider">🗑️ Vider le panier</button>
+    <button id="demo">🎬 Exemple interactif</button>
+  </div>
+</div>
+
+<script>
+const produitsData = [
+  { nom: "🍎 Pomme", prix: 2, description: "Fruit frais", max: 5 },
+  { nom: "🥖 Pain", prix: 3, description: "Baguette traditionnelle", max: 3 },
+  { nom: "🥛 Lait", prix: 5, description: "Bouteille de lait", max: 2 },
+  { nom: "🍫 Chocolat", prix: 7, description: "Tablette chocolatée", max: 4 }
+];
+
+const produitsContainer = document.querySelector(".produits");
+const listePanier = document.getElementById("liste-panier");
+const totalEl = document.getElementById("total");
+const viderBtn = document.getElementById("vider");
+const demoBtn = document.getElementById("demo");
+
+function recalculerTotal() {
+  let total = 0;
+  listePanier.querySelectorAll("li").forEach(li => {
+    const prix = parseFloat(li.querySelector(".prixPanier").textContent);
+    const qte = parseInt(li.querySelector(".quantitePanier").value);
+    const remise = qte >= 3 ? 0.1 : 0;
+    total += prix * qte * (1 - remise);
+  });
+  totalEl.textContent = `Total : ${total.toFixed(2)} DH`;
+}
+
+// Générer les produits
+produitsData.forEach(prod => {
+  const div = document.createElement("div");
+  div.className = "produit";
+
+  const spanNom = document.createElement("span");
+  spanNom.textContent = prod.nom;
+
+  const spanPrix = document.createElement("span");
+  spanPrix.textContent = prod.prix;
+
+  const inputQte = document.createElement("input");
+  inputQte.type = "number";
+  inputQte.value = 1;
+  inputQte.min = 1;
+
+  const btnAjouter = document.createElement("button");
+  btnAjouter.textContent = "Ajouter";
+
+  btnAjouter.addEventListener("click", () => addToCart(prod, parseInt(inputQte.value)));
+
+  div.appendChild(spanNom);
+  div.appendChild(spanPrix);
+  div.appendChild(inputQte);
+  div.appendChild(btnAjouter);
+
+  produitsContainer.appendChild(div);
+});
+
+// Ajouter au panier
+function addToCart(prod, qte) {
+  if (qte > prod.max) {
+    alert(`Vous ne pouvez ajouter que ${prod.max} ${prod.nom}`);
+    return;
+  }
+  const li = document.createElement("li");
+
+  const nomPanier = document.createElement("span");
+  nomPanier.textContent = prod.nom;
+
+  const inputPanier = document.createElement("input");
+  inputPanier.type = "number";
+  inputPanier.min = 1;
+  inputPanier.max = prod.max;
+  inputPanier.value = qte;
+  inputPanier.className = "quantitePanier";
+  inputPanier.addEventListener("input", () => {
+    if (parseInt(inputPanier.value) > prod.max) {
+      inputPanier.value = prod.max;
+      alert(`Quantité maximale pour ${prod.nom} = ${prod.max}`);
+    }
+    recalculerTotal();
+  });
+
+  const prixPanier = document.createElement("span");
+  prixPanier.textContent = prod.prix;
+  prixPanier.className = "prixPanier";
+
+  const btnSupprimer = document.createElement("button");
+  btnSupprimer.textContent = "❌";
+  btnSupprimer.style.background = "red";
+  btnSupprimer.addEventListener("click", () => {
+    li.remove();
+    recalculerTotal();
+  });
+
+  li.appendChild(nomPanier);
+  li.appendChild(inputPanier);
+  li.appendChild(prixPanier);
+  li.appendChild(btnSupprimer);
+
+  listePanier.appendChild(li);
+  recalculerTotal();
+}
+
+// Vider le panier
+viderBtn.addEventListener("click", () => {
+  listePanier.innerHTML = "";
+  recalculerTotal();
+});
+
+// Exemple interactif : ajout automatique
+demoBtn.addEventListener("click", () => {
+  listePanier.innerHTML = "";
+  addToCart(produitsData[0], 2); // 2 pommes
+  addToCart(produitsData[1], 3); // 3 pains → remise 10%
+  addToCart(produitsData[3], 1); // 1 chocolat
+});
+</script>
+
 </body>
 </html>
