@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Examen Licence HTML/CSS/JS</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="top-row">
+      <div>
+        <h1>Examen — HTML / CSS / JavaScript (Avancé)</h1>
+        <div class="muted">Durée : 20 min — 20 questions — Langue : français</div>
+      </div>
+      <div class="timer" id="timerDisplay">20:00</div>
+    </div>
+
+    <div class="start-card" id="startCard">
+      <h2>Informations de l'étudiant</h2>
+      <label for="filiere">Filière</label>
+      <input type="text" id="filiere" placeholder="Ex: Développement informatique">
+      <label for="nom">Nom</label>
+      <input type="text" id="nom" placeholder="Ex: Doe">
+      <label for="prenom">Prénom</label>
+      <input type="text" id="prenom" placeholder="Ex: John">
+      <button class="btn" id="startBtn">Commencer l'examen</button>
+      <button class="btn secondary" id="instructionsBtn">Voir instructions</button>
+      <div id="instructions" style="display:none;" class="small">
+        L'examen dure 20 minutes. Les bonnes réponses ne seront pas affichées. Un PDF sera généré à la fin.
+      </div>
+    </div>
+
+    <div class="exam-card" id="examCard" style="display:none;">
+      <div class="top-row">
+        <div class="small">Épreuve : HTML/CSS/JS</div>
+        <div class="small">Questions répondues : <span id="remainingQ">0</span>/20</div>
+      </div>
+      <div class="progress"><i id="progressBar"></i></div>
+      <div class="questions" id="questionsContainer"></div>
+      <button class="btn" id="submitBtn">Soumettre l'examen</button>
+      <button class="btn secondary" id="clearBtn">Réinitialiser réponses</button>
+    </div>
+
+    <div class="result-card" id="resultCard" style="display:none;">
+      <h2>Résultat</h2>
+      <p id="resultSummary" class="small"></p>
+      <button class="btn" id="downloadPdfBtn">Générer PDF</button>
+      <button class="btn secondary" id="restartBtn">Refaire l'examen</button>
+    </div>
+  </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
